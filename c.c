@@ -49,7 +49,7 @@ struct feedback_customer_seller
 
 struct pesan{
     char nama[30], jasa[20], harga[20],metode[20],nomor_telepon[20],email[20];
-    int count;
+    int jumlah;
 }pesan;  
 
 
@@ -76,6 +76,7 @@ void laporan_seller();
 void laporan();
 void lihat_laporan_customer();
 void lihat_laporan_seller();
+void history();
 
 int main()
 {
@@ -830,12 +831,13 @@ void marketplace()
         }
     }
 
-    data_pesanan = fopen("data Pesanan.dat", "wb");
+    data_pesanan = fopen("data pesanan.dat", "wb");
     
     printf("Nama Pemesan\t: "); 
     gets(pesan.nama);
     printf("Jumlah Pesanan\t: "); 
-    gets(pesan.jumlah);
+    scanf("%d",&pesan.jumlah);
+    getchar();
     printf("Nomor telepon\t: ");
     gets(pesan.nomor_telepon);
     printf("Email\t: ");
@@ -843,6 +845,9 @@ void marketplace()
 
     fwrite(&pesan,sizeof(pesan),1,data_pesanan);
     fclose(data_pesanan);
+
+    harga = seller_data.harga * pesan.jumlah;
+    printf("Total Harga : %d \n",&harga);
 
     printf("=============================================\n");
     printf("Pilih metode pembayaran \n");
