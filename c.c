@@ -77,6 +77,12 @@ void laporan();
 void lihat_laporan_customer();
 void lihat_laporan_seller();
 void history();
+void kode();
+void menu_informasi_akun();
+void informasi_akun_customer();
+void informasi_akun_seller();
+void menu_bahasa();
+// void english();
 
 int main()
 {
@@ -219,31 +225,28 @@ int logincustomer(int attempt)
 
     printf("Masukkan Username : ");
     gets(username);
+    printf("Masukkan Password : ");
+    gets(password);
 
     while (fread(&data, sizeof(data), 1, akun_customer) == 1)
     {
-        if (strcmp(data.username, username) == 0)
+        if (strcmp(data.username, username) == 0 && strcmp(data.password, password) == 0)
         {
-            printf("Masukkan Password : ");
-            gets(password);
-            if (strcmp(data.password, password) == 0)
-            {
-                useraktif = data;
-                fclose(akun_customer);
-                system("cls");
-                attempt = -1;
-                break;
-            }
-            else
-            {
-                attempt--;
-            }
+            useraktif = data;
+            fclose(akun_customer);
+            system("cls");
+            attempt = -1;
+            break;
+        }
+        else
+        {
+            attempt--;
         }
     }
 
     if (attempt == -1)
     {
-        menucustomer();
+        kode();
     }
     else if (attempt > 0)
     {
@@ -328,7 +331,7 @@ void menuadmin()
     printf("=============================================================\n");
     printf("1. Melihat Report\n");
     printf("2. Hapus akun\n");
-    printf("3. Pendapatan \n");
+    printf("3. Informasi akun\n");
     printf("4. History\n");
     printf("5. Logout\n");
     printf("Pilih menu (1/2/3/4/5): ");
@@ -347,7 +350,7 @@ void menuadmin()
         break;
 
     case 3:
-        // pendapatan();
+        menu_informasi_akun();
         break;
 
     case 4:
@@ -449,6 +452,33 @@ void menuseller()
     }
 }
 
+void menu_bahasa()
+{
+    int menu;
+    printf("============================================================\n");
+    printf("------------------------ INDOLANCE -------------------------\n");
+    printf("============================================================\n");
+    printf("1.Bahasa Indonesia\n2.English\n");
+    printf("Pilih menu (1/2)");
+    scanf("%d",&menu);
+    getchar();
+
+    switch(menu)
+    {
+        case 1:
+        system("cls");
+        menucustomer();
+        break;
+        case 2:
+        // english();
+        break;
+        default:
+        printf("your statement not defined");
+        break;
+    }
+
+}
+
 void registrasi_customer()
 {
     FILE *akun;
@@ -464,14 +494,13 @@ void registrasi_customer()
     gets(baru.password);
     printf("Masukkan Email: ");
     gets(baru.email);
-    printf("Masukkan Nomo Telepon: ");
+    printf("Masukkan Nomor Telepon: ");
     gets(baru.nomor_telepon);
     strcpy(data.status, "Tidak dipesan");
     data.saldo = 0;
     data.frekuensi = 0;
     data.pengeluaran = 0;
     printf("Akun telah berhasil didaftarkan. Silahkan login\n");
-
 
     fwrite(&baru, sizeof(baru), 1, akun);
     fclose(akun);
@@ -705,7 +734,7 @@ void hapus_akun_seller()
         return;
     }
 
-    // Membaca data dari file dan menampilkannya
+
     printf("Data Akun Seller:\n");
     while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
     {
@@ -714,7 +743,7 @@ void hapus_akun_seller()
         printf("\n");
     }
 
-    // Menutup file setelah selesai membacanya
+
     fclose(file);
 
     FILE *akun;
@@ -760,6 +789,103 @@ void hapus_akun_seller()
     menuadmin();
 }
 
+void menu_informasi_akun()
+{
+    printf("============================================================\n");
+    printf("------------------------ INDOLANCE -------------------------\n");
+    printf("============================================================\n");
+    int menu;
+
+    printf("1.Informasi akun customer\n2.Informasi akun seller\n3.Keluar\n");
+    printf("pilih menu (1/2/3) : ");
+    scanf("%d", &menu);
+    getchar();
+    system("cls");
+
+    switch (menu)
+    {
+    case 1:
+        printf("============================================================\n");
+        printf("------------------------ INDOLANCE -------------------------\n");
+        printf("============================================================\n");
+        informasi_akun_customer();
+        break;
+
+    case 2:
+        printf("============================================================\n");
+        printf("------------------------ INDOLANCE -------------------------\n");
+        printf("============================================================\n");
+        informasi_akun_seller();
+        break;
+
+    case 3:
+        menuadmin();
+        break;
+
+    default:
+        printf("maaf pilihan anda tidak tersedia\n");
+        main();
+        break;
+    }
+}
+
+void informasi_akun_customer()
+{
+    
+    FILE *file;
+    struct seller seller_data;
+
+    file = fopen("akun_customer.dat", "rb");
+
+    if (file == NULL)
+    {
+        printf("Gagal membuka file.\n");
+        return;
+    }
+
+    printf("Data Akun Customer:\n");
+    while (fread(&data, sizeof(data), 1, file) == 1)
+    {
+        printf("Username: %s\n", data.username);
+        printf("Password: %s\n", data.password);
+        printf("Nomor telepon : %s\n", data.nomor_telepon);
+        printf("Email: %s\n",data.email);
+        printf("\n");
+    }
+
+    fclose(file);
+}
+
+void informasi_akun_seller()
+{
+    FILE *file;
+    struct seller seller_data;
+
+    // Membuka file untuk dibaca dalam mode binary
+    file = fopen("akun_seller.dat", "rb");
+
+    // Memeriksa apakah file berhasil dibuka
+    if (file == NULL)
+    {
+        printf("Gagal membuka file.\n");
+        return;
+    }
+
+    // Membaca data dari file dan menampilkannya
+    printf("Data Akun Seller:\n");
+    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
+    {
+        printf("Username: %s\n", seller_data.username);
+        printf("Password: %s\n", seller_data.password);
+        printf("Nomor telepon : %s\n", seller_data.nomor_telepon);
+        printf("Email: %s\n",seller_data.email);
+        printf("\n");
+    }
+
+    // Menutup file setelah selesai membacanya
+    fclose(file);
+}
+
 void menambahkan_jasa()
 {
     FILE *jasa;
@@ -793,7 +919,7 @@ void marketplace()
     FILE *file;
     FILE *data_pesanan;
     char dicari[20];
-    int menu,harga;
+    int menu,harga,total_harga;
     struct seller seller_data;
 
     file = fopen("jasa.dat", "rb+");
@@ -824,8 +950,9 @@ void marketplace()
 
     while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
     {
-        if (seller_data.jasa == dicari)
+        if (strcmp(seller_data.jasa, dicari)==0 )
         {
+            harga = seller_data.harga;
             strcpy(seller_data.status, "Dipesan");
             break;
         }
@@ -846,8 +973,10 @@ void marketplace()
     fwrite(&pesan,sizeof(pesan),1,data_pesanan);
     fclose(data_pesanan);
 
-    harga = seller_data.harga * pesan.jumlah;
-    printf("Total Harga : %d \n",&harga);
+
+
+    total_harga = harga * pesan.jumlah;
+    printf("Total Harga : %d \n",total_harga);
 
     printf("=============================================\n");
     printf("Pilih metode pembayaran \n");
@@ -869,7 +998,7 @@ void marketplace()
         harga = seller_data.harga;
 
         if (harga > useraktif.saldo)
-        {
+            {
             printf("Mohon maaf saldo anda tidak mencukupi\n");
             fclose(akun);
             fclose(akun2);
@@ -903,7 +1032,7 @@ void marketplace()
         }
         break;
         case 2:
-
+        printf(""); //nomer rekening
         break;
     }
 
@@ -1152,10 +1281,59 @@ void history()
         printf("Username: %s\n", sorting[i].username);
         printf("Frekuensi: %d\n", sorting[i].frekuensi);
         printf("Pengeluaran: %d\n", sorting[i].pengeluaran);
-        printf("Status: %s\n", sorting[i].status);
         printf("============================================================\n");
     }
     system("pause");
     system("cls");
     menuadmin();
+}
+
+void kode() {
+    char kode1[10], kode2[10], kode3[10];
+    printf("\nMasukan kode dibawah ini\n");
+    printf("---------------\n");
+    printf("- Q.w.e.R.T.7 -\n");
+    printf("---------------\n");
+    printf("Masukkan kode : ");
+    scanf("%s", &kode1);
+    if (strcmp(kode1, "QweRT7") == 0) {
+        system("cls");
+        useraktif = data;
+        printf("\n======================= Login Berhasil =====================\n");
+        menu_bahasa();
+    } else {
+        system("cls");
+        printf("\nMasukkan kode baru dibawah ini\n");
+        printf("---------------\n");
+        printf("- A.S.D.f.g.3 -\n");
+        printf("---------------\n");
+        printf("Masukkan kode : ");
+        scanf("%s", &kode2);
+        if (strcmp(kode2, "ASDfg3") == 0){
+            system("cls");
+            useraktif = data;
+            printf("\n==================== Login Berhasil =======================\n");
+            menu_bahasa();
+        } else {
+            system("cls");
+            useraktif = data;
+            printf("\nMasukkan kode baru dibawah ini\n");
+            printf("---------------\n");
+            printf("- Z.x.c.V.B.1 -\n");
+            printf("---------------\n");
+            printf("Masukkan kode : ");
+            scanf("%s", &kode3);
+            if (strcmp(kode3, "ZxcVB1") == 0){
+                system("cls");
+                useraktif = data;
+                printf("\n========================= Login Berhasil ===================\n");
+                menu_bahasa();
+            } else {
+                printf("Silahkan coba lagi nanti\n");
+                system("pause");
+                system("cls");
+                main();
+            }
+        }
+    }
 }
