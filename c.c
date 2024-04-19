@@ -16,6 +16,9 @@ struct seller
     int harga;
     char keterangan[50];
     char nama[20];
+    char feedback[20];
+    char laporan[100];
+    char customer[20];
 } data_seller, selleraktif;
 
 struct customer
@@ -26,9 +29,13 @@ struct customer
     int saldo;
     int frekuensi, pengeluaran;
     char status[20];
+    char laporan[50];
+    char pengirim[20];
+    char seller[20];
 } data, useraktif;
 
-struct feedback_customer_seller {
+struct feedback_customer_seller
+{
     char customer_username[20];
     char seller_username[20];
     char feedback[50];
@@ -52,7 +59,11 @@ void marketplace();
 void feedback();
 void lihat_feedback();
 void cekstatus();
-
+void laporan_customer();
+void laporan_seller();
+void laporan();
+void lihat_laporan_customer();
+void lihat_laporan_seller();
 
 int main()
 {
@@ -73,7 +84,7 @@ int main()
         printf("============================================================\n");
         printf("------------------------ Indolance -------------------------\n");
         printf("============================================================\n");
-        loginadmin(3); 
+        loginadmin(3);
         menuadmin();
         break;
 
@@ -101,7 +112,7 @@ int main()
         break;
 
     case 5:
-        printf("");
+        printf("Exiting the program. Goodbye!\n");
         break;
 
     default:
@@ -174,7 +185,7 @@ void menu_registrasi()
         break;
 
     case 3:
-        printf("Exiting the program. Goodbye!\n");
+        main();
         break;
 
     default:
@@ -304,8 +315,8 @@ void menuadmin()
     printf("=============================================================\n");
     printf("1. Melihat Report\n");
     printf("2. Hapus akun\n");
-    printf("3. Update Status Laundry\n");
-    printf("4. Melihat History Laundry\n");
+    printf("3. Pendapatan \n");
+    printf("4. History\n");
     printf("5. Logout\n");
     printf("Pilih menu (1/2/3/4/5): ");
     scanf("%d", &menu);
@@ -315,21 +326,15 @@ void menuadmin()
     switch (menu)
     {
     case 1:
-        printf("============================================================\n");
-        printf("------------------------ INDOLANCE -------------------------\n");
-        printf("============================================================\n");
-        // laporan();
+        laporan();
         break;
 
     case 2:
-        printf("============================================================\n");
-        printf("------------------------ INDOLANCE -------------------------\n");
-        printf("============================================================\n");
         menu_hapus_akun();
         break;
 
     case 3:
-        // update();
+        // pendapatan();
         break;
 
     case 4:
@@ -375,7 +380,7 @@ void menucustomer()
         feedback();
         break;
     case 5:
-        // report();
+        laporan_customer();
         break;
     case 6:
         printf("Logout Berhasil\n");
@@ -409,10 +414,10 @@ void menuseller()
         // update_status();
         break;
     case 3:
-        //penghasilan();
+        // penghasilan();
         break;
     case 4:
-        // report_reseller();
+        laporan_seller();
         break;
     case 5:
         lihat_feedback();
@@ -552,6 +557,9 @@ void saldo()
 
 void menu_hapus_akun()
 {
+    printf("============================================================\n");
+    printf("------------------------ INDOLANCE -------------------------\n");
+    printf("============================================================\n");
     int menu;
 
     printf("1.Hapus akun seller\n2.Hapus akun customer\n3.Keluar\n");
@@ -577,7 +585,7 @@ void menu_hapus_akun()
         break;
 
     case 3:
-        printf("Exiting the program. Goodbye!\n");
+        menuadmin();
         break;
 
     default:
@@ -592,18 +600,17 @@ void hapus_akun_customer()
     FILE *file;
     struct seller seller_data;
 
-    // Membuka file untuk dibaca dalam mode binary
     file = fopen("akun_customer.dat", "rb");
 
-    // Memeriksa apakah file berhasil dibuka
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Gagal membuka file.\n");
         return;
     }
 
-    // Membaca data dari file dan menampilkannya
     printf("Data Akun Customer:\n");
-    while (fread(&data, sizeof(data), 1, file) == 1) {
+    while (fread(&data, sizeof(data), 1, file) == 1)
+    {
         printf("Username: %s\n", data.username);
         printf("Password: %s\n", data.password);
         printf("\n");
@@ -664,14 +671,16 @@ void hapus_akun_seller()
     file = fopen("akun_seller.dat", "rb");
 
     // Memeriksa apakah file berhasil dibuka
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Gagal membuka file.\n");
         return;
     }
 
     // Membaca data dari file dan menampilkannya
     printf("Data Akun Seller:\n");
-    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1) {
+    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
+    {
         printf("Username: %s\n", seller_data.username);
         printf("Password: %s\n", seller_data.password);
         printf("\n");
@@ -728,16 +737,17 @@ void menambahkan_jasa()
     FILE *jasa;
     struct seller baru = {0};
 
-    jasa = fopen("jasa.dat","ab");
+    jasa = fopen("jasa.dat", "ab");
 
     printf("Masukkan Nama Toko: ");
     gets(baru.nama);
     printf("Masukkan Jasa: ");
     gets(baru.jasa);
     printf("Masukan keterangan: ");
-    gets(baru.keterangan);;
+    gets(baru.keterangan);
+    ;
     printf("Masukkan Harga: ");
-    scanf("%d",&baru.harga);
+    scanf("%d", &baru.harga);
 
     fwrite(&baru, sizeof(baru), 1, jasa);
     fclose(jasa);
@@ -746,8 +756,6 @@ void menambahkan_jasa()
     system("pause");
     system("cls");
     menuseller();
-    
-
 }
 
 void marketplace()
@@ -757,13 +765,15 @@ void marketplace()
 
     file = fopen("jasa.dat", "rb");
 
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Gagal membuka file.\n");
         return;
     }
 
     printf("Marketplace:\n");
-    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1) {
+    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
+    {
         printf("Nama Toko : %s\n", seller_data.nama);
         printf("Seller    : %s\n", seller_data.username); // Menampilkan username seller
         printf("Jasa      : %s\n", seller_data.jasa);
@@ -782,56 +792,65 @@ void marketplace()
 void feedback()
 {
     FILE *file;
-    file = fopen("feedback.dat", "ab");
+    struct feedback_customer_seller feedback_data;
 
-    printf("==============================================================\n");
-    printf("------------------------- Indolance --------------------------\n");
-    printf("==============================================================\n");
-    strcpy(data.username, useraktif.username);
+    file = fopen("feedback.dat", "ab"); // Buka file feedback untuk ditulis dalam mode append binary
 
+    if (file == NULL)
+    {
+        printf("Gagal membuka file.\n");
+        return;
+    }
+
+    char seller_tujuan[20];
     printf("Masukkan username seller yang ingin diberi feedback: ");
-    gets(data_seller.username);
+    gets(seller_tujuan);
 
     printf("Masukkan komentar: ");
-    gets(data.feedback);
+    gets(feedback_data.feedback);
 
-    struct feedback_customer_seller feedback_data;
     strcpy(feedback_data.customer_username, useraktif.username);
-    strcpy(feedback_data.seller_username, data_seller.username);
-    strcpy(feedback_data.feedback, data.feedback);
+    strcpy(feedback_data.seller_username, seller_tujuan);
     fwrite(&feedback_data, sizeof(feedback_data), 1, file);
-
     fclose(file);
 
     printf("Komentar telah dikirim\n");
+
     system("pause");
     system("cls");
     menucustomer();
 }
 
-void lihat_feedback() {
+void lihat_feedback()
+{
     FILE *file;
     struct feedback_customer_seller feedback_data;
 
     file = fopen("feedback.dat", "rb");
-
-    if (file == NULL) {
-        printf("Tidak ada umpan balik saat ini.\n");
+    if (file == NULL)
+    {
+        printf("Gagal membuka file.\n");
         return;
     }
 
     printf("============================================================\n");
-    printf("---------------------- Umpan Balik Pelanggan ----------------\n");
+    printf("---------------------- Umpan Balik dari Pembeli -------------\n");
     printf("============================================================\n");
 
-    // Membaca dan menampilkan setiap data umpan balik dari file
-    while (fread(&feedback_data, sizeof(feedback_data), 1, file) == 1) {
-        printf("Pelanggan: %s\n", feedback_data.customer_username);
-        printf("Komentar : %s\n", feedback_data.feedback);
-        printf("\n");
+    while (fread(&feedback_data, sizeof(feedback_data), 1, file) == 1)
+    {
+        if (strcmp(feedback_data.seller_username, selleraktif.username) == 0)
+        {
+            printf("Pembeli: %s\n", feedback_data.customer_username);
+            printf("Komentar: %s\n", feedback_data.feedback);
+        }
     }
 
     fclose(file);
+
+    system("pause");
+    system("cls");
+    menuseller();
 }
 
 void cekstatus()
@@ -843,4 +862,136 @@ void cekstatus()
     system("pause");
     system("cls");
     menucustomer();
+}
+
+void laporan_customer()
+{
+    FILE *file;
+    file = fopen("laporan_customer.dat", "ab");
+
+    printf("==============================================================\n");
+    printf("------------------------- INDOLANCE --------------------------\n");
+    printf("==============================================================\n");
+    printf("Masukkan nama          : ");
+    gets(data.username);
+
+    printf("Masukkan nama seller   : ");
+    gets(data.seller);
+
+    printf("Masukkan komentar      : ");
+    gets(data.laporan);
+
+    fwrite(&data, sizeof(data), 1, file);
+
+    fclose(file);
+
+    printf("Komentar telah dikirim\n");
+    system("pause");
+    system("cls");
+    menucustomer();
+}
+
+void laporan_seller()
+{
+    FILE *file;
+
+    file = fopen("laporan_seller.dat", "ab");
+
+    printf("==============================================================\n");
+    printf("-------------------------- INDOLANCE -------------------------\n");
+    printf("==============================================================\n");
+    printf("Masukkan nama          : ");
+    gets(data_seller.username);
+
+    printf("Masukkan nama customer : ");
+    gets(data_seller.customer);
+
+    printf("Masukkan komentar      : ");
+    gets(data_seller.laporan);
+
+    fwrite(&data_seller, sizeof(data_seller), 1, file);
+
+    fclose(file);
+
+    printf("Komentar telah dikirim\n");
+    system("pause");
+    system("cls");
+    menucustomer();
+}
+
+void laporan()
+{
+    int menu;
+    printf("==============================================================\n");
+    printf("-------------------------- INDOLANCE -------------------------\n");
+    printf("==============================================================\n");
+    printf("1.Laporan Customer\n2.Laporan Seller\n3.Kembali\n");
+    printf("pilih menu (1/2/3) : ");
+    scanf("%d", &menu);
+    getchar();
+    system("cls");
+
+    switch (menu)
+    {
+    case 1:
+        lihat_laporan_customer();
+        break;
+    case 2:
+        lihat_laporan_seller();
+        break;
+    case 3:
+        menuadmin();
+        break;
+    default:
+        printf("Pilihan anda tidak tersedia");
+        break;
+    }
+}
+
+void lihat_laporan_customer()
+{
+    FILE *file;
+    struct customer data;
+
+    file = fopen("laporan_customer.dat", "rb");
+    printf("==============================================================\n");
+    printf("-------------------------- INDOLANCE -------------------------\n");
+    printf("==============================================================\n");
+
+    while (fread(&data, sizeof(data), 1, file))
+    {
+        printf("Nama               : %s\n", data.username);
+        printf("Akun yang di lapor : %s\n", data.seller);
+        printf("Laporan            : %s\n", data.laporan);
+        printf("-------------------------\n");
+    }
+
+    fclose(file);
+    system("pause");
+    system("cls");
+    menuadmin();
+}
+
+void lihat_laporan_seller()
+{
+    FILE *file;
+    struct seller data_seller;
+
+    file = fopen("laporan_seller.dat", "rb");
+    printf("==============================================================\n");
+    printf("-------------------------- INDOLANCE -------------------------\n");
+    printf("==============================================================\n");
+
+    while (fread(&data_seller, sizeof(data_seller), 1, file))
+    {
+        printf("Nama Pelapor       : %s\n", data_seller.username);
+        printf("Akun yang di lapor : %s\n", data_seller.customer);
+        printf("Laporan            : %s\n", data_seller.laporan);
+        printf("-------------------------\n");
+    }
+
+    fclose(file);
+    system("pause");
+    system("cls");
+    menuadmin();
 }
