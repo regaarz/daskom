@@ -12,19 +12,25 @@ struct seller
 {
     char username[20];
     char password[20];
-    char jasa[20];
+    char email[20];
+    char nomor_telepon[20];
+    char jasa[30];
+    int jumlah;
     int harga;
     char keterangan[50];
-    char nama[20];
+    char nama[30];
     char feedback[20];
     char laporan[100];
     char customer[20];
+    char status[20];
 } data_seller, selleraktif;
 
 struct customer
 {
     char username[20];
     char password[20];
+    char email[20];
+    char nomor_telepon[20];
     char feedback[20];
     int saldo;
     int frekuensi, pengeluaran;
@@ -40,6 +46,12 @@ struct feedback_customer_seller
     char seller_username[20];
     char feedback[50];
 };
+
+struct pesan{
+    char nama[30], jasa[20], harga[20],metode[20],nomor_telepon[20],email[20];
+    int count;
+}pesan;  
+
 
 int loginadmin(int attempt);
 int loginseller(int attempt);
@@ -338,7 +350,7 @@ void menuadmin()
         break;
 
     case 4:
-        // history();
+        history();
         break;
 
     case 5:
@@ -400,8 +412,8 @@ void menuseller()
     printf("============================================================\n");
     printf("------------------------ INDOLANCE -------------------------\n");
     printf("============================================================\n");
-    printf("1.Menambahkan Jasa\n2.Update status\n3.Penghasilan\n4.Report\n5.Melihat feedback\n6.Logout\n");
-    printf("Pilih menu (1/2/3/4/5): ");
+    printf("1.Menambahkan Jasa\n2.Update status\n3.Penghasilan\n4.Report\n5.Pesanan\n6.Melihat feedback\n7.Logout\n");
+    printf("Pilih menu (1/2/3/4/5/6/7): ");
     scanf("%d", &menu);
     getchar();
     system("cls");
@@ -420,8 +432,11 @@ void menuseller()
         laporan_seller();
         break;
     case 5:
-        lihat_feedback();
+        // pesanan();
+        break;
     case 6:
+        lihat_feedback();
+    case 7:
         printf("Logout Berhasil\n");
         system("pause");
         system("cls");
@@ -446,11 +461,19 @@ void registrasi_customer()
     gets(baru.username);
     printf("Masukkan Password : ");
     gets(baru.password);
+    printf("Masukkan Email: ");
+    gets(baru.email);
+    printf("Masukkan Nomo Telepon: ");
+    gets(baru.nomor_telepon);
+    strcpy(data.status, "Tidak dipesan");
+    data.saldo = 0;
+    data.frekuensi = 0;
+    data.pengeluaran = 0;
+    printf("Akun telah berhasil didaftarkan. Silahkan login\n");
+
 
     fwrite(&baru, sizeof(baru), 1, akun);
     fclose(akun);
-
-    printf("Registrasi Berhasil\n");
     system("pause");
     system("cls");
     main();
@@ -467,6 +490,10 @@ void registrasi_seller()
     gets(new_seller.username);
     printf("Masukkan Password : ");
     gets(new_seller.password);
+    printf("Masukkan Email : ");
+    gets(new_seller.email);
+    printf("Masukkan Nomor Telepon : ");
+    gets(new_seller.nomor_telepon);
 
     fwrite(&new_seller, sizeof(new_seller), 1, akun);
     fclose(akun);
@@ -737,17 +764,19 @@ void menambahkan_jasa()
     FILE *jasa;
     struct seller baru = {0};
 
-    jasa = fopen("jasa.dat", "ab");
+    jasa = fopen("jasa.dat", "ab+");
 
     printf("Masukkan Nama Toko: ");
     gets(baru.nama);
     printf("Masukkan Jasa: ");
     gets(baru.jasa);
+    printf("Masukkan Status: ");
+    gets(baru.status);
     printf("Masukan keterangan: ");
     gets(baru.keterangan);
-    ;
     printf("Masukkan Harga: ");
     scanf("%d", &baru.harga);
+    getchar();
 
     fwrite(&baru, sizeof(baru), 1, jasa);
     fclose(jasa);
@@ -761,9 +790,12 @@ void menambahkan_jasa()
 void marketplace()
 {
     FILE *file;
+    FILE *data_pesanan;
+    char dicari[20];
+    int menu,harga;
     struct seller seller_data;
 
-    file = fopen("jasa.dat", "rb");
+    file = fopen("jasa.dat", "rb+");
 
     if (file == NULL)
     {
@@ -774,19 +806,102 @@ void marketplace()
     printf("Marketplace:\n");
     while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
     {
-        printf("Nama Toko : %s\n", seller_data.nama);
-        printf("Seller    : %s\n", seller_data.username); // Menampilkan username seller
-        printf("Jasa      : %s\n", seller_data.jasa);
-        printf("Keterangan: %s\n", seller_data.keterangan);
-        printf("Harga     : %d\n", seller_data.harga);
+        printf("Nama Toko  : %s\n", seller_data.nama);
+        printf("Jasa       : %s\n", seller_data.jasa);
+        printf("status     : %s\n", seller_data.status);
+        printf("Keterangan : %s\n", seller_data.keterangan);
+        printf("Harga      : %d\n", seller_data.harga);
         printf("\n");
     }
 
-    system("pause");
-    system("cls");
-    menucustomer();
-
     fclose(file);
+
+    printf("Pilih jasa yang ingin dipesan: ");
+    gets(dicari);
+
+    file = fopen("jasa.dat","rb+");
+
+    while (fread(&seller_data, sizeof(seller_data), 1, file) == 1)
+    {
+        if (seller_data.jasa == dicari)
+        {
+            strcpy(seller_data.status, "Dipesan");
+            break;
+        }
+    }
+
+    data_pesanan = fopen("data Pesanan.dat", "wb");
+    
+    printf("Nama Pemesan\t: "); 
+    gets(pesan.nama);
+    printf("Jumlah Pesanan\t: "); 
+    gets(pesan.jumlah);
+    printf("Nomor telepon\t: ");
+    gets(pesan.nomor_telepon);
+    printf("Email\t: ");
+    gets(pesan.email);
+
+    fwrite(&pesan,sizeof(pesan),1,data_pesanan);
+    fclose(data_pesanan);
+
+    printf("=============================================\n");
+    printf("Pilih metode pembayaran \n");
+    printf("1.Saldo\n2.Transfer\n");
+    printf("Pilih metode pembayaran : ");
+    scanf("%d", &menu);
+
+    switch(menu)
+    {
+        case 1:
+        printf("============================================================\n");
+        printf("------------------------ D'LAUNDRY -------------------------\n");
+        printf("============================================================\n");
+        FILE *akun;
+        FILE *akun2;
+        akun = fopen("akun_customer.dat", "rb");
+        akun2 = fopen("akun_customer2.dat", "wb");
+
+        harga = seller_data.harga;
+
+        if (harga > useraktif.saldo)
+        {
+            printf("Mohon maaf saldo anda tidak mencukupi\n");
+            fclose(akun);
+            fclose(akun2);
+            system("pause");
+            system("cls");
+            menucustomer();
+        }
+        else
+        {
+            while (fread(&data, sizeof(data), 1, akun) == 1)
+            {
+                if (strcmp(useraktif.username, data.username) == 0)
+                {
+                    data.saldo -= harga;
+                    data.pengeluaran += harga;
+                    data.frekuensi += 1;
+                }
+                fwrite(&data, sizeof(data), 1, akun2);
+            }
+            fclose(akun);
+            fclose(akun2);
+
+            remove("akun_customer.dat");
+            rename("akun_customer2.dat", "akun_customer.dat");
+
+            printf("Setor Berhasil\n");
+            system("pause");
+            system("cls");
+            menucustomer();
+            break;
+        }
+        break;
+        case 2:
+
+        break;
+    }
+
 }
 
 void feedback()
@@ -841,8 +956,8 @@ void lihat_feedback()
     {
         if (strcmp(feedback_data.seller_username, selleraktif.username) == 0)
         {
-            printf("Pembeli: %s\n", feedback_data.customer_username);
-            printf("Komentar: %s\n", feedback_data.feedback);
+            printf("Pembeli  : %s\n", feedback_data.customer_username);
+            printf("Komentar : %s\n", feedback_data.feedback);
         }
     }
 
@@ -991,6 +1106,50 @@ void lihat_laporan_seller()
     }
 
     fclose(file);
+    system("pause");
+    system("cls");
+    menuadmin();
+}
+
+void history()
+{
+    FILE *akun;
+    int i, j;
+    struct customer temp, sorting[30];
+    int count = 0;
+
+    akun = fopen("akun_customer.dat", "rb");
+
+    while (fread(&data, sizeof(data), 1, akun) == 1)
+    {
+        sorting[count] = data;
+        count++;
+    }
+
+    fclose(akun);
+
+    for (i = 0; i < count - 1; i++)
+    {
+        for (j = 0; j < count - i - 1; j++)
+        {
+            if (sorting[j].frekuensi < sorting[j + 1].frekuensi)
+            {
+                temp = sorting[j];
+                sorting[j] = sorting[j + 1];
+                sorting[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("========================= History =========================\n");
+    for (i = 0; i < count; i++)
+    {
+        printf("Username: %s\n", sorting[i].username);
+        printf("Frekuensi: %d\n", sorting[i].frekuensi);
+        printf("Pengeluaran: %d\n", sorting[i].pengeluaran);
+        printf("Status: %s\n", sorting[i].status);
+        printf("============================================================\n");
+    }
     system("pause");
     system("cls");
     menuadmin();
